@@ -29,7 +29,7 @@ function modelList($source_url) {
 }
 
 function hashTag($tank){
-	return '#' . preg_replace('/_{2,}/','_',preg_replace('/[-\, \.]|_{2,}/','_',$tank));
+	return '#' . preg_replace('/_{2,}/','_',preg_replace('/[- \,\.\/\`\'*)("«]|_{2,}/','_',$tank));
 }
 
 function replaysHash(array $source_tanks_model, $source_url='https://novapress.com/Project/RSS/4dcfab8e-eb9f-4c1c-9bd4-5c965db7bec4?v=2'){
@@ -52,6 +52,7 @@ function replaysHash(array $source_tanks_model, $source_url='https://novapress.c
 		$totalNumbers = strlen(count($tanks)+1);
 		foreach ($tanks as $key => $tank) {
 			echo '' . str_pad($key+1,$totalNumbers,'0',STR_PAD_LEFT) . '. ' . $tank . ' = ' . hashTag($tank) . '<br>';
+//			echo '' . str_pad($key+1,$totalNumbers,'0',STR_PAD_LEFT) . '. ' . $tank . '<br>';
 		}
 		?>
 		<H1>Замена тегов в RSS</H1>
