@@ -1,13 +1,13 @@
-<?php
+﻿<?php
 
-$source_url =[
+$source_url = array(
 'http://wiki.wargaming.net/ru/Tank_types_lighttank',
 'http://wiki.wargaming.net/ru/Tank_types_mediumtank',
 'http://wiki.wargaming.net/ru/Tank_types_heavytank',
 'http://wiki.wargaming.net/ru/Tank_types_at-spg',
-'http://wiki.wargaming.net/ru/Tank_types_spg'];
+'http://wiki.wargaming.net/ru/Tank_types_spg');
 
-function parser($url,string $start='<div class="wot-frame-1">',string $finish='NewPP limit report') {
+function parser($url,$start='<div class="wot-frame-1">',$finish='NewPP limit report') {
 	$content = file_get_contents($url);
 	$position = strpos($content, $start);
 
@@ -18,18 +18,18 @@ function parser($url,string $start='<div class="wot-frame-1">',string $finish='N
 	return $content;
 }
 
-function modelList(array $source_url):array {
-	$cleared_tnaks=[];
+function modelList($source_url) {
+	$cleared_tanks=array();
 	for ($i=0; $i < count($source_url); $i++) {
 		preg_match_all('~&#160;<a href="/ru/Tank:(.*?)</a>~is', parser($source_url[$i]), $tanks);
 		$tanks = $tanks[1];
-		foreach ($tanks as $tank) $cleared_tnaks[]=substr($tank,(strrpos($tank,'>')+1));
+		foreach ($tanks as $tank) $cleared_tanks[]=substr($tank,(strrpos($tank,'>')+1));
 	}
-	return $cleared_tnaks;
+	return $cleared_tanks;
 }
 
-function hashTag(string $tank):string{
-	return '#' . preg_replace(array('/-/', '/ /', '/\./', '/__/'),'_',$tank);
+function hashTag($tank){
+	return '#' . preg_replace('/_{2,}/','_',preg_replace('/[-\, \.]|_{2,}/','_',$tank));
 }
 
 function replaysHash(array $source_tanks_model, $source_url='https://novapress.com/Project/RSS/4dcfab8e-eb9f-4c1c-9bd4-5c965db7bec4?v=2'){
@@ -41,8 +41,6 @@ function replaysHash(array $source_tanks_model, $source_url='https://novapress.c
 }
 
 ?>
-
-
 
 <html>
 	<header>
