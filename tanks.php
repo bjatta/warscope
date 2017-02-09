@@ -29,7 +29,7 @@ function modelList($source_url) {
 }
 
 function hashTag($tank){
-	return '#' . preg_replace('/_{2,}/','_',preg_replace('/[- \,\.\/\`\'*)("«»„“]|_{2,}/u','_',$tank));
+	return '#' . preg_replace('/_{2,}/','_',preg_replace('/[- \,\/\`\'"«»„“]/u','_',preg_replace('/[\.*)(]/u','',$tank)));
 }
 
 function replaysHash(array $source_tanks_model, $source_url='https://novapress.com/Project/RSS/4dcfab8e-eb9f-4c1c-9bd4-5c965db7bec4?v=2'){
