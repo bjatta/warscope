@@ -1,4 +1,5 @@
 <?php
+
 $source_url =[
 'http://wiki.wargaming.net/ru/Tank_types_lighttank',
 'http://wiki.wargaming.net/ru/Tank_types_mediumtank',
@@ -6,27 +7,56 @@ $source_url =[
 'http://wiki.wargaming.net/ru/Tank_types_at-spg',
 'http://wiki.wargaming.net/ru/Tank_types_spg'];
 
-function parser($url,$start,$finish) {
-$content = file_get_contents($url);
-$position = strpos($content, $start);
+function parser($url,string $start='<div class="wot-frame-1">',string $finish='NewPP limit report') {
+	$content = file_get_contents($url);
+	$position = strpos($content, $start);
 
-$content = substr($content, $position);
-$position = strpos($content, $finish);
+	$content = substr($content, $position);
+	$position = strpos($content, $finish);
 
-$content = substr($content, 0, $position);
-return $content;
+	$content = substr($content, 0, $position);
+	return $content;
 }
 
-echo '<html><header><meta charset="UTF-8" /></header><body>';
-
-for ($i=0; $i < count($source_url); $i++) {
-	preg_match_all('~&#160;<a href="/ru/Tank:(.*?)</a>~is', parser($source_url[$i], '<div class="wot-frame-1">', 'NewPP limit report'), $tanks);
-	$tanks = $tanks[1];
-	foreach ($tanks as $tank) {
-		$hash_tag[]='#' . preg_replace(array('/-/', '/ /', '/\./', '/__/'),'_',substr($tank,(strrpos($tank,'>')+1)));
+function modelList(array $source_url):array {
+	$cleared_tnaks=[];
+	for ($i=0; $i < count($source_url); $i++) {
+		preg_match_all('~&#160;<a href="/ru/Tank:(.*?)</a>~is', parser($source_url[$i]), $tanks);
+		$tanks = $tanks[1];
+		foreach ($tanks as $tank) $cleared_tnaks[]=substr($tank,(strrpos($tank,'>')+1));
 	}
+	return $cleared_tnaks;
 }
 
-echo "<pre>". print_r($hash_tag, true)."</pre>";
-echo '</body></html>';
+function hashTag(string $tank):string{
+	return '#' . preg_replace(array('/-/', '/ /', '/\./', '/__/'),'_',$tank);
+}
+
+function replaysHash(array $source_tanks_model, $source_url='https://novapress.com/Project/RSS/4dcfab8e-eb9f-4c1c-9bd4-5c965db7bec4?v=2'){
+	$str = file_get_contents($source_url);
+	foreach ($source_tanks_model as $key => $tank) {
+		str_replace($tank,hashTag($tank),$str);
+	}
+	return str_replace('##','#',$str);
+}
+
 ?>
+
+
+
+<html>
+	<header>
+		<meta charset="UTF-8" />
+	</header>
+	<body>
+		<?php
+		$tanks = modelList($source_url);
+		$totalNumbers = strlen(count($tanks)+1);
+		foreach ($tanks as $key => $tank) {
+			echo '' . str_pad($key+1,$totalNumbers,'0',STR_PAD_LEFT) . '. ' . $tank . ' = ' . hashTag($tank) . '<br>';
+		}
+		?>
+		<H1>Замена тегов в RSS</H1>
+		<?= replaysHash($tanks); ?>
+	</body>
+</html>
